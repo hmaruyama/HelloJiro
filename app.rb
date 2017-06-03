@@ -23,11 +23,28 @@ julius.each_message do |message, prompt|
     voice_message = message.sentence
     puts "次の方トッピングなにしますか〜？ : #{voice_message.gsub(',', '')}"
 
-    request_body = {
-      topping_name: "ninniku",
-      mashi: 2
-    }
+    words = voice_message.split(',')
 
-    RestClient.post("http://localhost:3000/pigs/kabuki/topping_logs", request_body.to_json, {content_type: :json})
+
+    topping_types.each do |key, value|
+      topping_code = key
+      topping_name = value
+
+      topping_index = words.index(topping_name)
+      unless topping_index.nil?
+        if words[topping_index+1] == quantity[:mashimashi]
+          mashi_count = 2
+        else
+          mashi_count = 1
+        end
+
+        request_body = {
+          topping_name: topping_code,
+          mashi: mashi_count
+        }
+
+        RestClient.post("http://localhost:3000/pigs/kabuki/topping_logs", request_body.to_json, {content_type: :json})
+      end
+    end
   end
 end
